@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Encryptor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4"></script>
+<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+</head>
+
+<body>
+    <h2>Image Encryption</h2>
+    <form id="encryptForm">
+        <label for="imageUrl">Image URL:</label><br>
+        <input type="text" id="imageUrl" name="imageUrl"><br>
+        <label for="text">Password 1:</label><br>
+        <input type="text" id="password1" name="password1"><br>
+        <label for="text">Password 2:</label><br>
+        <input type="text" id="password2" name="password2"><br><br>
+        <button type="button" onclick="encryptAndSave()">Encrypt and Save</button>
+    </form>
+
+    <!-- Add an element to display the result image -->
+    <img id="resultImage" src="" alt="Result Image">
+
+    <!-- Add a div to display the encrypted data -->
+    <div id="encryptedData"></div>
+
+    <div id="encryptedData2"></div>
+
+
+
+    <hr>
+
+    <h2>Decryption</h2>
+    <label for="decryptionPassword">Decryption location:</label><br>
+    <input type="text" id="loc" name="decryptionPassword"><br><br>
+        <label for="decryptionPassword">Decryption password:</label><br>
+    <input type="text" id="decryptionPassword" name="decryptionPassword"><br><br>
+        <label for="decryptionPassword">Decryption password goten:</label><br>
+    <input type="text" id="decryptionPassword2" name="decryptionPassword"><br><br>
+    <button type="button" onclick="decryptAndDisplay()">Decrypt</button>
+
+  <label for="myCheckbox">Check this box:</label>
+  <input type="checkbox" id="myCheckbox">
+
+    <!-- Add a div to display the decrypted data -->
+    <div id="decryptedData"></div>
+
+            <img id="resultImage2" src="" alt="Result Image2">
+            <div id="final" ></div>
+
+            <div id="qrcode"></div>
+
+    <script>
+
+
+
+
+const queryString = window.location.search;
+
+// Create a URLSearchParams object from the query string
+const searchParams = new URLSearchParams(queryString);
+        const param1 = searchParams.get('p1');
+        const param2 = searchParams.get('p2');
+        const param3 = searchParams.get('p3');
+        const loc = searchParams.get('loc');
+
+        if (param1!=null)
+        {
+            console.log("p1",param1); // Value of param1
+            document.getElementById("decryptionPassword").value=param1;
+        }
+
+        if (param2!=null)
+        {
+            console.log("p2",param2); // Value of param1
+            document.getElementById("decryptionPassword2").value=param2;
+
+        }
+        if (param3!=null){
+            console.log("p3",param3)
+             document.getElementById("myCheckbox").checked=true;
+        }
+
+        if (loc!=null)
+        {
+            console.log("loc",loc); // Value of param1
+            document.getElementById("loc").value=loc;
+        }
+
+
+function downloadTextAsFile(text, filename) {
+  // Create a Blob containing the text data
+  const blob = new Blob([text], { type: 'text/plain' });
+
+  // Create a URL for the Blob
+  const url = window.URL.createObjectURL(blob);
+
+  // Create a download link
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+
+  // Trigger a click event on the link to start the download
+  a.click();
+
+  // Clean up by revoking the object URL
+  window.URL.revokeObjectURL(url);
+}
+
+
+function hashString(inputString) {
+  // Convert the input string to a WordArray object
+  const wordArray = CryptoJS.enc.Utf8.parse(inputString);
+  
+  // Calculate the SHA-256 hash of the WordArray
+  const hash = CryptoJS.SHA256(wordArray);
+  
+  // Convert the hash to a hexadecimal string
+  const hexHash = hash.toString(CryptoJS.enc.Hex);
+  console.log(hexHash);
+  
+  return hexHash;
+}
+        function encryptAndSave() {
+
+            const imageUrl = document.getElementById('imageUrl').value;
+            const password1 = document.getElementById('password1').value;
+            const password2 = hashString(document.getElementById('password2').value);
+
+
+
+
+
+            if (imageUrl) {
+                fetch(imageUrl)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        var reader = new FileReader();
+                        reader.readAsDataURL(blob);
+
+                        reader.onloadend = function () {
+                            var base64data = reader.result;
+
+                            // Convert base64 back to image and display
+                            document.getElementById('resultImage').src = base64data;
+
+                            document.getElementById('encryptedData2').textContent = base64data;
+
+                            // Encrypt the image data
+                            let encrypted = CryptoJS.AES.encrypt(base64data, password1).toString();
+                            encrypted = CryptoJS.AES.encrypt(encrypted, password2).toString();
+                            console.log("Encrypted Data: ", encrypted);
+
+                            // Display the encrypted data in the 'encryptedData' div
+                            document.getElementById('encryptedData').textContent = encrypted;
+
+
+                            downloadTextAsFile(encrypted, "myimage.txt")
+
+
+                        };
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+
+async function getTextFromFileUrl(url) {
+  try {
+    // Fetch the text file from the URL
+    const response = await fetch(url);
+
+    // Check if the response status is OK (200)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch the file. Status: ${response.status}`);
+    }
+
+    // Read the response body as text
+    const text = await response.text();
+
+    return text;
+  } catch (error) {
+    console.error(`Error fetching file from URL: ${url}`, error);
+    throw error;
+  }
+}
+
+    function urlToQRCode(url) {
+
+
+  // Create a QR code object
+  const qr = qrcode(0, 'M');
+  
+  // Set the data (URL) to be encoded
+  qr.addData(url);
+  
+  // Make the QR code
+  qr.make();
+
+  // Create a new HTML <img> element with the QR code image
+  const qrCodeImage = document.createElement('img');
+  
+  // Set the src attribute of the <img> element to the data URL of the QR code
+  qrCodeImage.src = qr.createDataURL();
+
+  // Append the <img> element to the document or do whatever you want with it
+  document.body.appendChild(qrCodeImage);
+
+    }
+
+function hashString(inputString) {
+  // Convert the input string to a WordArray object
+  const wordArray = CryptoJS.enc.Utf8.parse(inputString);
+  
+  // Calculate the SHA-256 hash of the WordArray
+  const hash = CryptoJS.SHA256(wordArray);
+  
+  // Convert the hash to a hexadecimal string
+  const hexHash = hash.toString(CryptoJS.enc.Hex);
+  console.log(hexHash);
+  
+  return hexHash;
+}
+
+
+        function decryptAndDisplay() {
+            const decryptionPassword = document.getElementById('decryptionPassword').value;
+            const decryptionPassword2 = document.getElementById('decryptionPassword2').value;
+            encriptPW=decryptionPassword2;
+            if (document.getElementById("myCheckbox").checked==false){
+                encriptPW=hashString( decryptionPassword2 );
+            }
+
+
+            getTextFromFileUrl(document.getElementById('loc').value).then((text) => {
+    console.log('File content:', text);
+
+
+
+
+            const encryptedData = text;
+            console.log(encryptedData);
+
+            //console.log("dp1",decryptionPassword);
+            //console.log("dp2",decryptionPassword2);
+
+
+
+
+
+
+                    if (decryptionPassword && encryptedData) {
+                        try {
+                            // Decrypt the data
+                            let decrypted = CryptoJS.AES.decrypt(encryptedData, encriptPW).toString(CryptoJS.enc.Utf8);
+
+                            let decrypted2 = CryptoJS.AES.decrypt(decrypted, decryptionPassword).toString(CryptoJS.enc.Utf8);
+
+                            // Display the decrypted data in the 'decryptedData' div
+                            document.getElementById('decryptedData').textContent = decrypted2;
+                            document.getElementById('resultImage2').src = decrypted2;
+                            val = "http://localhost:8000/encript.html?p1="+decryptionPassword+"&p2="+encriptPW+"&loc=https://alex2060.github.io/Identifier/test.txt&p3=1";
+                            document.getElementById("final").innerHTML=val;
+
+                            new QRCode(document.getElementById("qrcode"), "https://webisora.com");
+
+                    
+
+
+                        } catch (error) {
+                            console.error('Decryption Error:', error);
+                            document.getElementById('decryptedData').textContent = 'Decryption failed. Check your password.';
+                        }
+                    }
+
+
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+        }
+    </script>
+</body>
+
+</html>
