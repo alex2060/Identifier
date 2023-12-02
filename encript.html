@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 
@@ -344,9 +345,9 @@ function hashString(inputString) {
 
         function decryptAndDisplay() {
             const decryptionPassword = document.getElementById('decryptionPassword').value;
-            const decryptionPassword2 = document.getElementById('decryptionPassword2').value;
-
-            encriptPW=decryptionPassword2+document.getElementById('password3').value;
+            const decryptionPassword2 = document.getElementById('decryptionPassword2').value+document.getElementById('password3').value;
+            console.log("check",decryptionPassword2);
+            encriptPW=decryptionPassword2;
             if (document.getElementById("myCheckbox").checked==false){
                 encriptPW=hashString( decryptionPassword2 );
             }
