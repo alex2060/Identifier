@@ -1,14 +1,123 @@
 <!DOCTYPE html>
 <html>
 
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  button[type="button"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+
+  button[type="button"]:hover {
+    background-color: #0056b3;
+  }
+
+  hr {
+    margin: 20px 0;
+  }
+
+  #resultImage,
+  #resultImage2 {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  #encryptedData,
+  #encryptedData2,
+  #decryptedData,
+  #final {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+  }
+
+  #qrcode {
+    text-align: center;
+  }
+
+  #qrcode img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  #myCheckbox {
+    margin-left: 10px;
+  }
+</style>
+
+<style>
+  /* ... (previous CSS styles) */
+
+  #bottomSection {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: left; /* Adjust text alignment as needed */
+  }
+
+  /* ... (previous CSS styles) */
+</style>
+
+
 <head>
-    <title>Image Encryptor</title>
+
+<div style="text-align: center;">
+  <img src="https://cdn.nerdweek.com.br/uploads/2019/05/Pop.jpg" alt="A beautiful sunset" width="300" height="200">
+</div>
+
+
+    <title>Reality Anchor</title>
+
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4"></script>
 <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 
 </head>
+
 
 <body>
     <h2>Image Encryption</h2>
@@ -19,6 +128,7 @@
         <input type="text" id="password1" name="password1"><br>
         <label for="text">Password 2:</label><br>
         <input type="text" id="password2" name="password2"><br><br>
+
         <button type="button" onclick="encryptAndSave()">Encrypt and Save</button>
     </form>
 
@@ -35,13 +145,17 @@
     <hr>
 
     <h2>Decryption</h2>
+    <div id="bottomSection">
     <label for="decryptionPassword">Decryption location:</label><br>
     <input type="text" id="loc" name="decryptionPassword"><br><br>
         <label for="decryptionPassword">Decryption password:</label><br>
     <input type="text" id="decryptionPassword" name="decryptionPassword"><br><br>
         <label for="decryptionPassword">Decryption password goten:</label><br>
     <input type="text" id="decryptionPassword2" name="decryptionPassword"><br><br>
+    <label for="text">Password 3:</label><br>
+    <input type="text" id="password3" name="password2"><br><br>
     <button type="button" onclick="decryptAndDisplay()">Decrypt</button>
+
 
   <label for="myCheckbox">Check this box:</label>
   <input type="checkbox" id="myCheckbox">
@@ -54,6 +168,7 @@
 
             <div id="qrcode"></div>
 
+</div>
     <script>
 
 
@@ -230,7 +345,8 @@ function hashString(inputString) {
         function decryptAndDisplay() {
             const decryptionPassword = document.getElementById('decryptionPassword').value;
             const decryptionPassword2 = document.getElementById('decryptionPassword2').value;
-            encriptPW=decryptionPassword2;
+
+            encriptPW=decryptionPassword2+document.getElementById('password3').value;
             if (document.getElementById("myCheckbox").checked==false){
                 encriptPW=hashString( decryptionPassword2 );
             }
@@ -287,3 +403,4 @@ function hashString(inputString) {
 </body>
 
 </html>
+
